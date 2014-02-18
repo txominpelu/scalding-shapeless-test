@@ -14,9 +14,49 @@ package com.snowplowanalytics.hadoop.scalding
 
 // Specs2
 import org.specs2.mutable.Specification
+import com.twitter.algebird.Monoid
 
 // Scalding
 import com.twitter.scalding._
+
+import TDsl._
+import com.twitter.scalding.TypedPipe
+
+import shapeless._
+import record._
+import syntax.singleton._
+
+object TUtil {
+  def printStack( fn: => Unit ) {
+    try { fn } catch { case e : Throwable => e.printStackTrace; throw e }
+  }
+}
+
+object Utils {
+  val (wCount, wWord) = (Witness("count"), Witness("word"))
+  type WordCount = :: [shapeless.record.FieldType[wWord.T,String], ::[shapeless.record.FieldType[wCount.T,Long], HNil]] with Serializable
+}
+
+class TypedPipeJob(args : Args) extends Job(args) {
+
+  //Word count using TypedPipe
+  TextLine("inputFile")
+    .flatMap { _.split("\\s+") }
+    .map { w => "word" ->> w :: "count" ->> 1L :: HNil }
+    //.forceToDisk
+    // I would like to write groupByField("word") and fail if there's not such field (and it would drop the field from the record)
+    .groupBy((b) => b("word") )
+    // word passes as an aggregation key but is dropped from the value record
+    .mapValues((x) => x.drop(Nat._1))
+    .mapValues(_("count"))
+    // I would like to write sum and have the monoid generated for me
+    // or I would like to say monoidWithFields ("count") and it would generate a monoid that adds the count field and ignores the others
+    .sum// (sMonoid)
+    //.map(x => (x._1, x._2("count")))
+    //.forceToReducers
+    //.debug
+    .write(TypedTsv[(String, Long)]("outputFile"))
+}
 
 class WordCountTest extends Specification with TupleConversions {
   "A WordCount job" should {
@@ -33,5 +73,27 @@ class WordCountTest extends Specification with TupleConversions {
       }.
       run.
       finish
+  }
+}
+
+class TypedPipeTest extends Specification {
+
+
+  import Dsl._
+  "A TypedPipe" should {
+    TUtil.printStack {
+      JobTest(new TypedPipeJob(_)).
+        source(TextLine("inputFile"), List("0" -> "hack hack hack and hack")).
+        sink[(String,Long)](TypedTsv[(String,Long)]("outputFile")){ outputBuffer =>
+        val outMap = outputBuffer.toMap
+        "count words correctly" in {
+          outMap("hack") must be_==(4)
+          outMap("and") must be_==(1)
+        }
+      }.
+        run.
+        runHadoop.
+        finish
+    }
   }
 }

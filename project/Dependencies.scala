@@ -19,9 +19,9 @@ object Dependencies {
   )
 
   object V {
-    val scalding  = "0.8.5"
+    val scalding  = "0.8.11"
     val hadoop    = "0.20.2"
-    val specs2    = "1.12.3" // -> "1.13" when we bump to Scala 2.10.0
+    val specs2    = "1.13" // -> "1.13" when we bump to Scala 2.10.0
     // Add versions for your additional libraries here...
   }
 
@@ -32,5 +32,7 @@ object Dependencies {
 
     // Scala (test only)
     val specs2       = "org.specs2"                 %% "specs2"               % V.specs2       % "test"
+    val shapeless    = "com.chuusai" % "shapeless" % "2.0.0-M1" cross CrossVersion.full exclude("log4j","log4j")
+    val log4j        = "log4j" % "log4j" % "1.2.17"
   }
 }
