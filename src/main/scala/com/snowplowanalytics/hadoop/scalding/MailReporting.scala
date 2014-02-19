@@ -1,6 +1,5 @@
 package com.snowplowanalytics.hadoop.scalding
 
-import org.joda.time.DateMidnight
 
 import com.twitter.scalding.Args
 import com.twitter.scalding._
@@ -23,13 +22,13 @@ class MailReporting(args: Args) extends Job(args: Args) /*extends JobUtil(args) 
     }.getOrElse(input)
 
     val inputWithDay = inputFiltered.map('Created -> 'Day) { created: Long =>
-      new org.joda.time.DateMidnight(created).toDate().getTime()
+      System.currentTimeMillis
     }
 
-    val count  = inputWithDay.groupBy('Day, 'Status, 'Campaign, 'Monthly) { _.size('Count)(NB_REDUCERS)}
-    val start  = inputWithDay.groupBy('Day, 'Status, 'Campaign, 'Monthly) { _.min('Created)(NB_REDUCERS) }.rename('Created -> 'StartDate)
-    val median = inputWithDay.groupBy('Day, 'Status, 'Campaign, 'Monthly) { _.average('Created)(NB_REDUCERS) }.rename('Created -> 'MedianDate)
-    val end    = inputWithDay.groupBy('Day, 'Status, 'Campaign, 'Monthly) { _.max('Created)(NB_REDUCERS) }.rename('Created -> 'EndDate)
+    val count  = inputWithDay.groupBy('Day, 'Status, 'Campaign, 'Monthly) { _.size('Count)}
+    val start  = inputWithDay.groupBy('Day, 'Status, 'Campaign, 'Monthly) { _.min('Created) }.rename('Created -> 'StartDate)
+    val median = inputWithDay.groupBy('Day, 'Status, 'Campaign, 'Monthly) { _.average('Created) }.rename('Created -> 'MedianDate)
+    val end    = inputWithDay.groupBy('Day, 'Status, 'Campaign, 'Monthly) { _.max('Created) }.rename('Created -> 'EndDate)
 
     count
       .joinWithTiny(('Day, 'Campaign, 'Status, 'Monthly) -> ('Day, 'Campaign, 'Status, 'Monthly), start)
@@ -39,7 +38,7 @@ class MailReporting(args: Args) extends Job(args: Args) /*extends JobUtil(args) 
 
   //val startingDate = args.optional("starting-date").map(DateUtil.parse(_))
 
-  val biReport = computeBiReport(logInputs, None).mapTo(('Day, 'Campaign, 'Status, 'Count, 'StartDate, 'MedianDate, 'EndDate, 'Monthly) -> 'biReport) {
+    val biReport = computeBiReport(logInputs, None).mapTo(('Day, 'Campaign, 'Status, 'Count, 'StartDate, 'MedianDate, 'EndDate, 'Monthly) -> 'biReport) {
     fields: (Long, String, String, Int, Long, Long, Long, Boolean) =>
 
   val (day, campaign, status, count, startDate, medianDate, lastCreated, monthly) = fields
