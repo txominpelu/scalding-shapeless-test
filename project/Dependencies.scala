@@ -36,11 +36,5 @@ object Dependencies {
     val shapeless    = "com.chuusai" % "shapeless" % "2.0.0-M1" cross CrossVersion.full exclude("log4j","log4j")
     val log4j        = "log4j" % "log4j" % "1.2.17"
 
-    val cascadingCore           = "cascading"                         %  "cascading-core"            % V.cascadingVersion
-    val cascadingLocal          = "cascading"                         %  "cascading-local"           % V.cascadingVersion
-    val cascadingHadoop         = "cascading"                         %  "cascading-hadoop"          % V.cascadingVersion
-    val cascadingAvro           = "cascading.avro"                    %  "avro-scheme"               % "2.1.1"
-    val jodaTime                = "joda-time"                         %  "joda-time"                 % "2.2"
-
   }
 }

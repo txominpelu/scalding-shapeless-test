@@ -12,6 +12,8 @@ class MailReporting(args: Args) extends Job(args: Args) /*extends JobUtil(args) 
 
   //val logInputs = mailedReportedField(args("logs"), 0).discard('TemplateId)
 
+  val logInputs = IterableSource(List(4,5,6,7), 'foo).read
+
   val NB_REDUCERS = 8
 
 
@@ -41,8 +43,8 @@ class MailReporting(args: Args) extends Job(args: Args) /*extends JobUtil(args) 
     val biReport = computeBiReport(logInputs, None).mapTo(('Day, 'Campaign, 'Status, 'Count, 'StartDate, 'MedianDate, 'EndDate, 'Monthly) -> 'biReport) {
     fields: (Long, String, String, Int, Long, Long, Long, Boolean) =>
 
-  val (day, campaign, status, count, startDate, medianDate, lastCreated, monthly) = fields
-      BIReport(day, status, count, campaign, startDate, medianDate, lastCreated, monthly)
+  //val (day, campaign, status, count, startDate, medianDate, lastCreated, monthly) = fields
+      //BIReport(day, status, count, campaign, startDate, medianDate, lastCreated, monthly)
   }
 
   //biReport.write(PackedAvroSource[BIReport](args("output-bi")))
