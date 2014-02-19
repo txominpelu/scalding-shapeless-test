@@ -29,11 +29,12 @@ object ScaldingExampleProjectBuild extends Build {
     .settings(
       libraryDependencies ++= Seq(
         Libraries.scaldingCore,
+        //Libraries.scaldingAvro,
         Libraries.hadoopCore,
         Libraries.specs2,
         Libraries.log4j,
         Libraries.shapeless
         // Add your additional libraries here (comma-separated)...
       )
-    )
+    ).settings(net.virtualvoid.sbt.graph.Plugin.graphSettings: _*)
 }

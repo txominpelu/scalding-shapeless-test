@@ -1,0 +1,19 @@
+{
+  "type":"record",
+  "name":"MailReport",
+  "namespace":"com.viadeo.data.bean",
+  "fields":[
+    {"name":"status","type":{"type":"string","avro.java.string":"String"}},
+    {"name":"email","type":{"type":"string","avro.java.string":"String"}},
+    {"name":"reason","type":"string"},
+    {"name":"memberId","type":{"type":"string","avro.java.string":"String"}},
+    {"name":"campaign","type":{"type":"string","avro.java.string":"String"}},
+    {"name":"created","type":"long"},
+    {"name":"id","type":{"type":"string","avro.java.string":"String"}},
+    {"name":"lang","type":{"type":"string","avro.java.string":"String"}},
+    {"name":"premium","type":"boolean"},
+    {"name":"visits","type":"int"},
+    {"name" : "adId", "type" : "int"},
+    {"name" : "monthly","type" : "boolean"}
+  ]
+}

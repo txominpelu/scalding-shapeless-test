@@ -28,6 +28,8 @@ class WordCountJob(args : Args) extends Job(args) {
   }
 }
 
+
+
 /*
  * Copyright (c) 2014 Miles Sabin 
  *
