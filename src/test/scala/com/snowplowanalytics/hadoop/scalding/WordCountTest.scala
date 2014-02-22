@@ -14,13 +14,14 @@ package com.snowplowanalytics.hadoop.scalding
 
 // Specs2
 import org.specs2.mutable.Specification
-import com.twitter.algebird.Monoid
+import shapeless.ops.record.{Remover, Updater}
 
 // Scalding
 import com.twitter.scalding._
 
+import org.specs2.mutable.Specification
+
 import TDsl._
-import com.twitter.scalding.TypedPipe
 
 import shapeless._
 import record._
@@ -37,12 +38,43 @@ object Utils {
   type WordCount = :: [shapeless.record.FieldType[wWord.T,String], ::[shapeless.record.FieldType[wCount.T,Long], HNil]] with Serializable
 }
 
+class TypedPipeTest extends Specification {
+  import Dsl._
+  "A TypedPipe" should {
+    TUtil.printStack {
+      JobTest(new TypedPipeJob(_)).
+        source(TextLine("inputFile"), List("0" -> "hack hack hack and hack")).
+        sink[(String,Long)](TypedTsv[(String,Long)]("outputFile")){ outputBuffer =>
+        val outMap = outputBuffer.toMap
+        "count words correctly" in {
+          outMap("hack") must be_==(4)
+          outMap("and") must be_==(1)
+        }
+      }.
+      run.
+      runHadoop.
+      finish
+    }
+  }
+}
+
 class TypedPipeJob(args : Args) extends Job(args) {
 
   //Word count using TypedPipe
   TextLine("inputFile")
     .flatMap { _.split("\\s+") }
     .map { w => "word" ->> w :: "count" ->> 1L :: HNil }
+    .map { w =>
+      val toAdd = ("tal" ->> "cual")
+      val wordTal = Witness("word")
+      w.remove("word")
+      val tTal = implicitly[Remover[Utils.WordCount, wordTal.T]]
+      println(tTal)
+      val witnessTal = Witness("tal")
+      val t = implicitly[Updater[Utils.WordCount, shapeless.record.FieldType[witnessTal.T,String]]]
+      t
+      w + toAdd
+    }
     //.forceToDisk
     // I would like to write groupByField("word") and fail if there's not such field (and it would drop the field from the record)
     .groupBy((b) => b("word") )
@@ -56,44 +88,4 @@ class TypedPipeJob(args : Args) extends Job(args) {
     //.forceToReducers
     //.debug
     .write(TypedTsv[(String, Long)]("outputFile"))
-}
-
-class WordCountTest extends Specification with TupleConversions {
-  "A WordCount job" should {
-    JobTest("com.snowplowanalytics.hadoop.scalding.WordCountJob").
-      arg("input", "inputFile").
-      arg("output", "outputFile").
-      source(TextLine("inputFile"), List("0" -> "hack hack hack and hack")).
-      sink[(String,Int)](Tsv("outputFile")){ outputBuffer =>
-        val outMap = outputBuffer.toMap
-        "count words correctly" in {
-          outMap("hack") must be_==(4)
-          outMap("and") must be_==(1)
-        }
-      }.
-      run.
-      finish
-  }
-}
-
-class TypedPipeTest extends Specification {
-
-
-  import Dsl._
-  "A TypedPipe" should {
-    TUtil.printStack {
-      JobTest(new TypedPipeJob(_)).
-        source(TextLine("inputFile"), List("0" -> "hack hack hack and hack")).
-        sink[(String,Long)](TypedTsv[(String,Long)]("outputFile")){ outputBuffer =>
-        val outMap = outputBuffer.toMap
-        "count words correctly" in {
-          outMap("hack") must be_==(4)
-          outMap("and") must be_==(1)
-        }
-      }.
-        run.
-        runHadoop.
-        finish
-    }
-  }
 }

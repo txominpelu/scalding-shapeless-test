@@ -20,7 +20,7 @@ object BuildSettings {
     organization  := "SnowPlow Analytics Ltd",
     version       := "0.0.4",
     description   := "The Scalding WordCountJob example as a standalone SBT project, ready for Amazon EMR",
-    scalaVersion  := "2.10.2", // -> 2.10.0 when Scalding is ready
+    scalaVersion  := "2.10.3", // -> 2.10.0 when Scalding is ready
     scalacOptions := Seq("-deprecation", "-encoding", "utf8"),
     resolvers     ++= Dependencies.resolutionRepos
   )

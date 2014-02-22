@@ -14,26 +14,42 @@ import sbt._
 
 object Dependencies {
   val resolutionRepos = Seq(
-    "Concurrent Maven Repo" at "http://conjars.org/repo" // For Scalding, Cascading etc
+    "Concurrent Maven Repo" at "http://conjars.org/repo", // For Scalding, Cascading etc
+    "Typesafe repository" at "http://repo.typesafe.com/typesafe/releases/",
+    "Cloudera Repository" at "https://repository.cloudera.com/artifactory/public/",
+    "Twitter Maven Repo" at "http://maven.twttr.com",
+    "Maven Repository" at "http://mvnrepository.com/artifact/",
+    "Apache public" at "https://repository.apache.org/content/groups/public",
+    "Cloudera2" at "https://repository.cloudera.com/artifactory/cloudera-repos/",
+    "Sonatype OSS Snapshots" at "http://oss.sonatype.org/content/repositories/snapshots/"
   )
 
   object V {
-    val scalding  = "0.9.0rc4"
-    val hadoop    = "2.0.0-mr1-cdh4.1.2"
+    val scalding  = "0.8.11"
+    val hadoop    = "2.0.0-mr1-cdh4.4.0"
     val specs2    = "1.13" // -> "1.13" when we bump to Scala 2.10.0
-    val cascadingVersion = "2.0.7"
+    val cascadingVersion = "2.2.0"
     // Add versions for your additional libraries here...
   }
 
   object Libraries {
-    val scaldingCore = "com.twitter"                %%  "scalding-core"       % V.scalding
-    val scaldingAvro = "com.twitter"                %%  "scalding-avro"       % V.scalding
-    val hadoopCore   = "org.apache.hadoop"          % "hadoop-core"           % V.hadoop       % "provided"
+    val hadoopVersion = "2.0.0-cdh4.1.2"
+    val hadoopMr1Version = "2.0.0-mr1-cdh4.1.2"
+    val scaldingVersion = "0.9.0rc4"
+
+    val cascadingCore   = "cascading"          % "cascading-core"           % V.cascadingVersion
+    val scaldingArgs            = "com.twitter"                       %% "scalding-args"             % scaldingVersion
+    val scaldingAvro            = "com.twitter"                       %% "scalding-avro"             % scaldingVersion
+    val scaldingCommons         = "com.twitter"                       %% "scalding-commons"          % "0.2.0"            exclude ("jvyaml", "jvyaml")
+    val scaldingCore            = "com.twitter"                       %% "scalding-core"             % scaldingVersion
+    val hadoopCommon            = "org.apache.hadoop"                 %  "hadoop-common"             % hadoopVersion      exclude ("org.slf4j", "slf4j-log4j12")
+     val hadoopHdfs              = "org.apache.hadoop"                 %  "hadoop-hdfs"               % hadoopVersion      exclude ("org.slf4j", "slf4j-log4j12") exclude ("commons-daemon", "commons-daemon")
+     val hadoopCore              = "org.apache.hadoop"                 %  "hadoop-core"               % hadoopMr1Version
     // Add additional libraries from mvnrepository.com (SBT syntax) here...
 
     // Scala (test only)
     val specs2       = "org.specs2"                 %% "specs2"               % V.specs2       % "test"
-    val shapeless    = "com.chuusai" % "shapeless" % "2.0.0-M1" cross CrossVersion.full exclude("log4j","log4j")
+    val shapeless    = "com.chuusai" % "shapeless" % "2.0.0-SNAPSHOT" cross CrossVersion.full changing()
     val log4j        = "log4j" % "log4j" % "1.2.17"
 
   }

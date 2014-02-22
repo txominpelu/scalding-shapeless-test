@@ -13,7 +13,6 @@
 package com.snowplowanalytics.hadoop.scalding
 
 // Hadoop
-import org.apache.hadoop
 
 // Scalding
 import com.twitter.scalding.Tool
